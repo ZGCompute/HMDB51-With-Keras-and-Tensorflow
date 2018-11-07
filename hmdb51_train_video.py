@@ -1,3 +1,8 @@
+# File: hmdb51_train_video.py
+#
+# Author: Zachary Greenberg
+# Last Edited: 11/04/18
+
 import os                                                                                                                                                                                                   
 import sys                                                                                                                                                          
 import functools
@@ -19,8 +24,7 @@ from keras.utils.training_utils import multi_gpu_model
                                                                                                                                                                                                                                                                                                                 
 import keras                                                                                                                                                        
 from keras.callbacks import ModelCheckpoint                                                                                                                         
-from keras.callbacks import EarlyStopping                                                                                                                           
-from keras.preprocessing.image import ImageDataGenerator                                                                                                            
+from keras.callbacks import EarlyStopping                                                                                                                                                                                                                                       
 from keras.callbacks import TensorBoard 
                                                                                                                             
 os.environ["CUDA_VISIBLE_DEVICES"]='0,1,2,3,4'                                                                                                                      
@@ -29,8 +33,8 @@ from time import time
 from keras.utils import plot_model                                                                                                                                  
                                                                                                                                                                         
 # add Ouva utils to path                                                                                                                                            
-sys.path.append('/home/ubuntu/Ouva_utils')                                                                                                                          
-from Ouva_Ml import * 
+sys.path.append('/path/to/utils')                                                                                                                          
+from utils_Ml import * 
 from PIL import Image                                                                                                                                              
 
 # Run training with true Batch-norm mean                                                                                                                            
@@ -52,17 +56,17 @@ class ActRec_CNN_LSTM():
         self.epoch_steps = (num_examples / batch_size) + 1   
         self.frames=12                                                                                                                    
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-        self.base_path = '/datag/jpegs_256';                                                                                                                                     
-        self.flow_path = '/datag/tvl1_flow';                                                                                                                                     
+        self.base_path = '/path/to/jpegs_256';                                                                                                                                     
+        self.flow_path = '/path/to/tvl1_flow';                                                                                                                                     
 
         self.video1 = layers.Input(shape=(None, 224,224,3),batch_shape=(batch_size, None, 224, 224, 3), name='video_input1') 
         self.video2 = layers.Input(shape=(None, 224,224,3),batch_shape=(batch_size, None, 224, 224, 3), name='video_input2')
 
-        self.Y_classes = np.loadtxt('/home/ubuntu/Ouva_utils/train/hmdb51_int_classes.txt')
-        self.train_split_file = '/home/ubuntu/Ouva_utils/train/hmdb51_train_split.txt'
-        self.test_split_file = '/home/ubuntu/Ouva_utils/train/hmdb51_test_split.txt' 
+        self.Y_classes = np.loadtxt('/path/to/utils/train/hmdb51_int_classes.txt')
+        self.train_split_file = '/path/to/utils/train/hmdb51_train_split.txt'
+        self.test_split_file = '/path/to/utils/train/hmdb51_test_split.txt' 
 
-        self.tensorboard = TensorBoard(log_dir="/home/ubuntu/Ouva_utils/logs/{}".format(time()))
+        self.tensorboard = TensorBoard(log_dir="/path/to/utils/logs/{}".format(time()))
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
     # hack to use callbacks with multi_gpu                                                                                                                              
     class MyCbk(keras.callbacks.Callback):                                                                                                                              
@@ -93,7 +97,7 @@ class ActRec_CNN_LSTM():
         return onehot_encoded                                                                                                                                           
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
     # Load in hmdb51 train splits list                                                                                                                                  
-    with open('/home/ubuntu/Ouva_utils/train/hmdb51_train_split.txt') as f:                                                                                             
+    with open('/path/to/utils/train/hmdb51_train_split.txt') as f:                                                                                             
         train_list = f.readlines()                                                                                                                                      
         train_list = [ i.strip() for i in train_list]                                                                                                                   
         train_list = [i[:-2] for i in train_list]                                                                                                                       
@@ -103,16 +107,13 @@ class ActRec_CNN_LSTM():
                                                                                                                                                                         
         '''Load Y_labels.txt into N x NUM_CLASSES onehot matrix'''                                                                                                      
                                                                                                                                                                         
-        Y = np.loadtxt(fname)                                                                                                                                           
-                                                                                                                                                                        
+        Y = np.loadtxt(fname)                                                                                                                                                                 
         onehot_encoded = np.zeros([51])                                                                                                                                 
-        onehot_encoded[int(Y[()])] = 1;                                                                                                                                 
-        #onehot_encoded = np.expand_dims(onehot_encoded, axis=0)                                                                                                        
+        onehot_encoded[int(Y[()])] = 1;                                                                                                                                                                                                                                         
                                                                                                                                                                         
         return onehot_encoded 
 
-    def build_rgb_model(self):                                                                                                                                       
-        #model=Sequential()                                                                                                                                             
+    def build_rgb_model(self):                                                                                                                                                                                                                                                                                    
                                                                                                                                                                         
         x = TimeDistributed(Conv2D(32, (3, 3), padding='same'), input_shape=(frames, 224, 224, 3))(self.video1)                                                              
         x = TimeDistributed(Activation('relu'))(x)                                                                                                                      
@@ -136,8 +137,7 @@ class ActRec_CNN_LSTM():
         return model
 
     def build_flow_model(self):                                                                                                                                       
-        #model=Sequential()                                                                                                                                             
-                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                     
         x = TimeDistributed(Conv2D(32, (3, 3), padding='same'), input_shape=(frames, 224, 224, 3))(self.video2)                                                              
         x = TimeDistributed(Activation('relu'))(x)                                                                                                                      
         x = TimeDistributed(Conv2D(32, (3, 3)))(x)                                                                                                                      
@@ -203,8 +203,7 @@ class ActRec_CNN_LSTM():
                                                                                                                                                                                                             
         return model
 
-    def get_deep_flow_model(self):                                                                                                                                                                           
-        # Define CNN-LSTM architecture                                                                                                                                                                
+    def get_deep_flow_model(self):                                                                                                                                                                                                                                                                                                                                           
                                                                                                                                                                                                             
         # contruct the model                                                                                                                                                                          
         cnn_base_model = InceptionV3(weights='imagenet', include_top=False)                                                                                                                           
@@ -226,7 +225,6 @@ class ActRec_CNN_LSTM():
         model = Model(inputs=video2,outputs=out)                                                                                                                                                      
                                                                                                                                                                                                             
         return model
-
 
     def batch_iter(self):      
                                                                                                                                               
@@ -349,9 +347,7 @@ class ActRec_CNN_LSTM():
     def train(self): 
 
         # move to directory with training tars unpacked                                                                                                                     
-        os.chdir(self.base_path);
-
-        # Stack together training data                                                                                                                                      
+        os.chdir(self.base_path);                                                                                                                                      
         dirs = os.listdir('.');
 
         print("Examples in train list: %d" %(len(dirs)))
