@@ -95,14 +95,7 @@ class ActRec_CNN_LSTM():
         onehot_encoded[int(Y[()])] = 1;                                                                                                                                 
                                                                                                                                                                         
         return onehot_encoded                                                                                                                                           
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-    # Load in hmdb51 train splits list                                                                                                                                  
-    with open('/path/to/utils/train/hmdb51_train_split.txt') as f:                                                                                             
-        train_list = f.readlines()                                                                                                                                      
-        train_list = [ i.strip() for i in train_list]                                                                                                                   
-        train_list = [i[:-2] for i in train_list]                                                                                                                       
-        train_list = [ i[:-4] for i in train_list]                                                                                                                      
-                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
     def load_Y_vid_lbl_onehot( fname ):                                                                                                                                                                         
                                                                                                                                                                         
         '''Load Y_labels.txt into N x NUM_CLASSES onehot matrix'''                                                                                                      
@@ -334,7 +327,7 @@ class ActRec_CNN_LSTM():
                  
                     Y = np.array(Y)
                     
-                    yield (RGB, Y)
+                    yield ([RGB, Flow], [Y,Y])
                     batch_num +=1
                     
                     # Generate infinite data
@@ -367,7 +360,7 @@ class ActRec_CNN_LSTM():
                                                                                     metrics=['mae','accuracy', top5_acc])
 
         history_callback = model.fit_generator(train_batches, validation_data=valid_batches, use_multiprocessing=False, 
-                                                                workers=1, shuffle=True, epochs=4,steps_per_epoch=50*2, 
+                                                                workers=1, shuffle=True, epochs=self.num_epochs,steps_per_epoch=50*2, 
                                                    validation_steps=50*2, verbose=1, callbacks=[cbk, self.tensorboard])
 
         # save updates after each epoch to .txt
