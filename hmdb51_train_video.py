@@ -84,7 +84,7 @@ class ActRec_CNN_LSTM():
         def earlyStopeer( self ):                                                                                                                                       
             self.earlyStopper = EarlyStopping(monitor='val_loss', patience=15, verbose=1)                                                                               
                                                                                                                                                                         
-    # Define custom video  onehot label encoder
+    # Define video  onehot label encoder
     def load_Y_vid_lbl_onehot( fname ):                                                                                                                                 
                                                                                                                                                                         
         '''Load Y_labels.txt into N x NUM_CLASSES onehot matrix'''                                                                                                      
@@ -96,16 +96,6 @@ class ActRec_CNN_LSTM():
                                                                                                                                                                         
         return onehot_encoded                                                                                                                                           
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-    def load_Y_vid_lbl_onehot( fname ):                                                                                                                                                                         
-                                                                                                                                                                        
-        '''Load Y_labels.txt into N x NUM_CLASSES onehot matrix'''                                                                                                      
-                                                                                                                                                                        
-        Y = np.loadtxt(fname)                                                                                                                                                                 
-        onehot_encoded = np.zeros([51])                                                                                                                                 
-        onehot_encoded[int(Y[()])] = 1;                                                                                                                                                                                                                                         
-                                                                                                                                                                        
-        return onehot_encoded 
-
     def build_rgb_model(self):                                                                                                                                                                                                                                                                                    
                                                                                                                                                                         
         x = TimeDistributed(Conv2D(32, (3, 3), padding='same'), input_shape=(frames, 224, 224, 3))(self.video1)                                                              
@@ -389,8 +379,3 @@ if __name__ == '__main__':
     CNN_LSTM = ActRec_CNN_LSTM();
     CNN_LSTM.train();
   
-
-
-
-
-    
